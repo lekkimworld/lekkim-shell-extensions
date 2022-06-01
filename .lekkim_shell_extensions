@@ -1,0 +1,47 @@
+# aliases, general
+alias ll='ls -l'
+alias lll='ls -la'
+alias topcpu='top -o cpu -n 5'
+
+# sfdx utils
+sfdx_describe_object() {
+   SFDX_APIVERSION=${${3}:-43.0}
+   SFDX_OUTPUT=`sfdx force:org:display -u $1 --json`
+   SFDX_ACCESS_TOKEN=`echo $SFDX_OUTPUT | jq -r ".result.accessToken"`
+   SFDX_INSTANCE_URL=`echo $SFDX_OUTPUT | jq -r ".result.instanceUrl"`
+   curl $SFDX_INSTANCE_URL/services/data/v${SFDX_APIVERSION}/sobjects/$2/describe -H 'Content-Type: application/json' -H "Authorization: Bearer $SFDX_ACCESS_TOKEN"
+   SFDX_OUTPUT=
+   SFDX_ACCESS_TOKEN=
+   SFDX_INSTANCE_URL=
+   SFDX_APIVERSION=
+}
+
+npm_update_all_global() {
+   npm list --location=global --json | jq ".dependencies | keys[]" -r | while read line; do
+      npm --location=global update "$line"
+   done
+}
+brew_update_all() {
+   brew update && brew upgrade && brew cleanup
+}
+heroku_update_all() {
+   heroku update
+}
+sfdx_update_all() {
+   sfdx plugins:unlink ~/Programming/repos/lwc-dev-server && sfdx update && sfdx plugins:link ~/Programming/repos/lwc-dev-server
+}
+lekkim_update_all_cli() {
+   npm_update_all_global
+   brew_update_all
+   heroku_update_all
+   sfdx_update_all
+}
+
+# exports
+export MAVEN_HOME=~/Programming/apache-maven/latest
+export ANT_HOME=~/Programming/apache-ant/latest
+export SALESFORCE_ANT_HOME=~/Programming/salesforce-ant/latest
+export NODEJS_HOME=/usr/local/bin/node
+export PATH=$PATH:$MAVEN_HOME/bin:$ANT_HOME/bin:~/Library/Python/2.7/bin:/usr/local/sbin:$NODEJS_HOME/bin
+
+
