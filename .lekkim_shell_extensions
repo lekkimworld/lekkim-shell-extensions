@@ -24,6 +24,20 @@ npm_update_all_global() {
 brew_update_all() {
    brew update && brew upgrade && brew cleanup
 }
+brew_backup() {
+   PWD=`pwd`
+   cd /tmp
+   rm -rf homebrew-backup
+   git clone git@github.com:lekkimworld/homebrew-backup.git
+   cd homebrew-backup
+   brew bundle dump --force
+   git add Brewfile
+   git commit -m "Update backup"
+   git push origin main
+   cd ..
+   rm -rf homebrew-backup
+   cd $PWD
+}
 heroku_update_all() {
    heroku update
 }
@@ -33,6 +47,7 @@ sfdx_update_all() {
 lekkim_update_all_cli() {
    npm_update_all_global
    brew_update_all
+   brew_backup
    heroku_update_all
    sfdx_update_all
 }
